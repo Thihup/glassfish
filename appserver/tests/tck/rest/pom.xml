@@ -74,6 +74,7 @@ mvn clean install -Dgroups=security
         <glassfish.arquillian.connector>arquillian-glassfish-server-managed</glassfish.arquillian.connector>
         <glassfish.web.server.port>8080</glassfish.web.server.port>
         <glassfish.listener.http.name>http-listener-1</glassfish.listener.http.name>
+       <signatureClassPath>${glassfish.home}/glassfish/modules/jakarta.ws.rs-api.jar${path.separator}${glassfish.home}/glassfish/modules/jakarta.xml.bind-api.jar${path.separator}${project.build.directory}/jdk-bundle/java.base${path.separator}${project.build.directory}/jdk-bundle/java.rmi${path.separator}${project.build.directory}/jdk-bundle/java.sql${path.separator}${project.build.directory}/jdk-bundle/java.naming</signatureClassPath>
     </properties>
 
     <dependencies>
@@ -197,7 +198,7 @@ mvn clean install -Dgroups=security
                                 <porting.ts.url.class.1>ee.jakarta.tck.ws.rs.lib.implementation.sun.common.SunRIURL</porting.ts.url.class.1>
                                 <jimage.dir>${project.build.directory}/jdk-bundle</jimage.dir>
                                 <optional.tech.packages.to.ignore>jakarta.xml.bind</optional.tech.packages.to.ignore>
-                                <signature.sigTestClasspath>${glassfish.home}/glassfish/modules/jakarta.ws.rs-api.jar${path.separator}${glassfish.home}/glassfish/modules/jakarta.xml.bind-api.jar${path.separator}${project.build.directory}/jdk-bundle/java.base${path.separator}${project.build.directory}/jdk-bundle/java.rmi${path.separator}${project.build.directory}/jdk-bundle/java.sql${path.separator}${project.build.directory}/jdk-bundle/java.naming</signature.sigTestClasspath>
+                                <signature.sigTestClasspath>${signatureClassPath}</signature.sigTestClasspath>
                             </systemPropertyVariables>
                         </configuration>
                     </execution>
@@ -260,6 +261,7 @@ mvn clean install -Dgroups=security
                <glassfish.arquillian.connector>arquillian-glassfish-server-embedded</glassfish.arquillian.connector>
                <glassfish.web.server.port>8181</glassfish.web.server.port>
                <glassfish.listener.http.name>http-listener</glassfish.listener.http.name>
+               <signatureClassPath>${glassfish.home}/embedded-web.jar${path.separator}${project.build.directory}/jdk-bundle/java.base${path.separator}${project.build.directory}/jdk-bundle/java.rmi${path.separator}${project.build.directory}/jdk-bundle/java.sql${path.separator}${project.build.directory}/jdk-bundle/java.naming</signatureClassPath>
            </properties>
            <dependencies>
                <!-- The Arquillian connector that starts GlassFish and deploys archives to it. -->
@@ -294,18 +296,11 @@ mvn clean install -Dgroups=security
                                <configuration>
                                    <artifactItems>
                                        <artifactItem>
-                                           <groupId>jakarta.ws.rs</groupId>
-                                           <artifactId>jakarta.ws.rs-api</artifactId>
-                                           <version>${jakarta.rest-api.version}</version>
-                                           <outputDirectory>${glassfish.home}/glassfish/modules</outputDirectory>
-                                           <destFileName>jakarta.ws.rs-api.jar</destFileName>
-                                       </artifactItem>
-                                       <artifactItem>
-                                           <groupId>jakarta.xml.bind</groupId>
-                                           <artifactId>jakarta.xml.bind-api</artifactId>
-                                           <version>${jakarta.xml.bind-api.version}</version>
-                                           <outputDirectory>${glassfish.home}/glassfish/modules</outputDirectory>
-                                           <destFileName>jakarta.xml.bind-api.jar</destFileName>
+                                           <groupId>org.glassfish.main.extras</groupId>
+                                           <artifactId>glassfish-embedded-web</artifactId>
+                                           <version>${project.version}</version>
+                                           <outputDirectory>${glassfish.home}/</outputDirectory>
+                                           <destFileName>embedded-web.jar</destFileName>
                                        </artifactItem>
                                    </artifactItems>
                                </configuration>

@@ -70,6 +70,10 @@ mvn clean install -Dgroups=security
         <glassfish.version>${project.version}</glassfish.version>
         <glassfish.root>${project.build.directory}</glassfish.root>
         <glassfish.home>${glassfish.root}/glassfish7</glassfish.home>
+        <glassfish.download.skip>false</glassfish.download.skip>
+        <glassfish.arquillian.connector>arquillian-glassfish-server-managed</glassfish.arquillian.connector>
+        <glassfish.web.server.port>8080</glassfish.web.server.port>
+        <glassfish.listener.http.name>http-listener-1</glassfish.listener.http.name>
     </properties>
 
     <dependencies>
@@ -80,12 +84,6 @@ mvn clean install -Dgroups=security
             <scope>test</scope>
         </dependency>
 
-        <!-- The Arquillian connector that starts GlassFish and deploys archives to it. -->
-        <dependency>
-            <groupId>org.omnifaces.arquillian</groupId>
-            <artifactId>arquillian-glassfish-server-managed</artifactId>
-            <version>1.4</version>
-        </dependency>
         <dependency>
             <groupId>org.jboss.arquillian.junit5</groupId>
             <artifactId>arquillian-junit5-container</artifactId>
@@ -133,6 +131,7 @@ mvn clean install -Dgroups=security
                             <goal>unpack</goal>
                         </goals>
                         <configuration>
+                            <skip>${glassfish.download.skip}</skip>
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>org.glassfish.main.distributions</groupId>
@@ -174,7 +173,8 @@ mvn clean install -Dgroups=security
                                 <glassfish.postBootCommands>
                                     create-file-user --groups staff:mgr:DIRECTOR --passwordfile ${project.build.directory}/test-classes/j2ee.pass j2ee
                                     create-file-user --groups guest:OTHERROLE --passwordfile ${project.build.directory}/test-classes/javajoe.pass javajoe
-                                    set server-config.network-config.protocols.protocol.http-listener-1.http.trace-enabled=true
+                                    set server-config.network-config.protocols.protocol.${glassfish.listener.http.name}.http.trace-enabled=true
+                                    list-jvm-options
                                 </glassfish.postBootCommands>
 
                                 <!--
@@ -190,18 +190,31 @@ mvn clean install -Dgroups=security
 
                                 <!-- Remnants from ancient TCK -->
                                 <webServerHost>localhost</webServerHost>
-                                <webServerPort>8080</webServerPort>
+                                <webServerPort>${glassfish.web.server.port}</webServerPort>
 
 
                                 <servlet_adaptor>org.glassfish.jersey.servlet.ServletContainer</servlet_adaptor>
                                 <porting.ts.url.class.1>ee.jakarta.tck.ws.rs.lib.implementation.sun.common.SunRIURL</porting.ts.url.class.1>
                                 <jimage.dir>${project.build.directory}/jdk-bundle</jimage.dir>
                                 <optional.tech.packages.to.ignore>jakarta.xml.bind</optional.tech.packages.to.ignore>
-                                <signature.sigTestClasspath>${glassfish.home}/glassfish/modules/jakarta.ws.rs-api.jar:${glassfish.home}/glassfish/modules/jakarta.xml.bind-api.jar:${project.build.directory}/jdk-bundle/java.base:${project.build.directory}/jdk-bundle/java.rmi:${project.build.directory}/jdk-bundle/java.sql:${project.build.directory}/jdk-bundle/java.naming</signature.sigTestClasspath>
+                                <signature.sigTestClasspath>${glassfish.home}/glassfish/modules/jakarta.ws.rs-api.jar${path.separator}${glassfish.home}/glassfish/modules/jakarta.xml.bind-api.jar${path.separator}${project.build.directory}/jdk-bundle/java.base${path.separator}${project.build.directory}/jdk-bundle/java.rmi${path.separator}${project.build.directory}/jdk-bundle/java.sql${path.separator}${project.build.directory}/jdk-bundle/java.naming</signature.sigTestClasspath>
                             </systemPropertyVariables>
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>3.5.2</version>
+                <configuration>
+                    <showSuccess>false</showSuccess>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+                <version>2.1</version>
             </plugin>
         </plugins>
     </build>
@@ -215,6 +228,14 @@ mvn clean install -Dgroups=security
             <properties>
                 <glassfish-artifact-id>glassfish</glassfish-artifact-id>
             </properties>
+            <dependencies>
+                <!-- The Arquillian connector that starts GlassFish and deploys archives to it. -->
+                <dependency>
+                    <groupId>org.omnifaces.arquillian</groupId>
+                    <artifactId>${glassfish.arquillian.connector}</artifactId>
+                    <version>1.7-SNAPSHOT</version>
+                </dependency>
+            </dependencies>
         </profile>
 
         <profile>
@@ -222,6 +243,77 @@ mvn clean install -Dgroups=security
             <properties>
                 <glassfish-artifact-id>web</glassfish-artifact-id>
             </properties>
+            <dependencies>
+                <!-- The Arquillian connector that starts GlassFish and deploys archives to it. -->
+                <dependency>
+                    <groupId>org.omnifaces.arquillian</groupId>
+                    <artifactId>${glassfish.arquillian.connector}</artifactId>
+                    <version>1.7-SNAPSHOT</version>
+                </dependency>
+            </dependencies>
         </profile>
+
+       <profile>
+           <id>embedded-web</id>
+           <properties>
+               <glassfish.download.skip>true</glassfish.download.skip>
+               <glassfish.arquillian.connector>arquillian-glassfish-server-embedded</glassfish.arquillian.connector>
+               <glassfish.web.server.port>8181</glassfish.web.server.port>
+               <glassfish.listener.http.name>http-listener</glassfish.listener.http.name>
+           </properties>
+           <dependencies>
+               <!-- The Arquillian connector that starts GlassFish and deploys archives to it. -->
+               <dependency>
+                   <groupId>org.omnifaces.arquillian</groupId>
+                   <artifactId>${glassfish.arquillian.connector}</artifactId>
+                   <version>1.7-SNAPSHOT</version>
+                   <exclusions>
+                          <exclusion>
+                            <groupId>org.glassfish.main.extras</groupId>
+                            <artifactId>glassfish-embedded-all</artifactId>
+                          </exclusion>
+                   </exclusions>
+               </dependency>
+               <dependency>
+                   <groupId>org.glassfish.main.extras</groupId>
+                   <artifactId>glassfish-embedded-web</artifactId>
+                   <version>${project.version}</version>
+               </dependency>
+           </dependencies>
+           <build>
+               <plugins>
+                   <plugin>
+                       <groupId>org.apache.maven.plugins</groupId>
+                       <artifactId>maven-dependency-plugin</artifactId>
+                       <executions>
+                           <execution>
+                               <phase>pre-integration-test</phase>
+                               <goals>
+                                   <goal>copy</goal>
+                               </goals>
+                               <configuration>
+                                   <artifactItems>
+                                       <artifactItem>
+                                           <groupId>jakarta.ws.rs</groupId>
+                                           <artifactId>jakarta.ws.rs-api</artifactId>
+                                           <version>${jakarta.rest-api.version}</version>
+                                           <outputDirectory>${glassfish.home}/glassfish/modules</outputDirectory>
+                                           <destFileName>jakarta.ws.rs-api.jar</destFileName>
+                                       </artifactItem>
+                                       <artifactItem>
+                                           <groupId>jakarta.xml.bind</groupId>
+                                           <artifactId>jakarta.xml.bind-api</artifactId>
+                                           <version>${jakarta.xml.bind-api.version}</version>
+                                           <outputDirectory>${glassfish.home}/glassfish/modules</outputDirectory>
+                                           <destFileName>jakarta.xml.bind-api.jar</destFileName>
+                                       </artifactItem>
+                                   </artifactItems>
+                               </configuration>
+                           </execution>
+                       </executions>
+                   </plugin>
+               </plugins>
+           </build>
+       </profile>
     </profiles>
 </project>

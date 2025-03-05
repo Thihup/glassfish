@@ -96,48 +96,6 @@
 
     <build>
         <plugins>
-            <!-- Download and installation of the GlassFish server used for testing  -->
-            <plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>unpack</id>
-                        <phase>generate-test-resources</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.glassfish.main.distributions</groupId>
-                                    <artifactId>${glassfish.artifact.id}</artifactId>
-                                    <version>${glassfish.version}</version>
-                                    <type>zip</type>
-                                    <overWrite>false</overWrite>
-                                    <outputDirectory>${glassfish.root}</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <reuseForks>false</reuseForks>
-                    <dependenciesToScan>
-                        <dependency>jakarta.json:jakarta.json-tck-tests</dependency>
-                    </dependenciesToScan>
-                    <systemPropertyVariables>
-                        <jimage.dir>${project.build.directory}/jdk-bundle</jimage.dir>
-                        <signature.sigTestClasspath>${glassfish.home}/glassfish/modules/jakarta.json-api.jar:${project.build.directory}/jdk-bundle/java.base:${project.build.directory}/jdk-bundle/java.rmi:${project.build.directory}/jdk-bundle/java.sql:${project.build.directory}/jdk-bundle/java.naming</signature.sigTestClasspath>
-                    </systemPropertyVariables>
-                    <additionalClasspathElements>
-                        <additionalClasspathElement>${glassfish.home}/glassfish/modules/jakarta.json-api.jar</additionalClasspathElement>
-                        <additionalClasspathElement>${glassfish.home}/glassfish/modules/parsson.jar</additionalClasspathElement>
-                    </additionalClasspathElements>
-                </configuration>
-            </plugin>
             <plugin>
                 <artifactId>maven-surefire-report-plugin</artifactId>
                 <executions>
@@ -164,10 +122,158 @@
 
     <profiles>
         <profile>
+            <id>full</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- Download and installation of the GlassFish server used for testing  -->
+                    <plugin>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.glassfish.main.distributions</groupId>
+                                            <artifactId>${glassfish.artifact.id}</artifactId>
+                                            <version>${glassfish.version}</version>
+                                            <type>zip</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${glassfish.root}</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <reuseForks>false</reuseForks>
+                            <dependenciesToScan>
+                                <dependency>jakarta.json:jakarta.json-tck-tests</dependency>
+                            </dependenciesToScan>
+                            <systemPropertyVariables>
+                                <jimage.dir>${project.build.directory}/jdk-bundle</jimage.dir>
+                                <signature.sigTestClasspath>${glassfish.home}/glassfish/modules/jakarta.json-api.jar${path.separator}${project.build.directory}/jdk-bundle/java.base${path.separator}${project.build.directory}/jdk-bundle/java.rmi${path.separator}${project.build.directory}/jdk-bundle/java.sql${path.separator}${project.build.directory}/jdk-bundle/java.naming</signature.sigTestClasspath>
+                            </systemPropertyVariables>
+                            <additionalClasspathElements>
+                                <additionalClasspathElement>${glassfish.home}/glassfish/modules/jakarta.json-api.jar</additionalClasspathElement>
+                                <additionalClasspathElement>${glassfish.home}/glassfish/modules/parsson.jar</additionalClasspathElement>
+                            </additionalClasspathElements>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>web</id>
             <properties>
                 <glassfish.artifact.id>web</glassfish.artifact.id>
             </properties>
+            <build>
+                <plugins>
+                    <!-- Download and installation of the GlassFish server used for testing  -->
+                    <plugin>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.glassfish.main.distributions</groupId>
+                                            <artifactId>${glassfish.artifact.id}</artifactId>
+                                            <version>${glassfish.version}</version>
+                                            <type>zip</type>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${glassfish.root}</outputDirectory>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <reuseForks>false</reuseForks>
+                            <dependenciesToScan>
+                                <dependency>jakarta.json:jakarta.json-tck-tests</dependency>
+                            </dependenciesToScan>
+                            <systemPropertyVariables>
+                                <jimage.dir>${project.build.directory}/jdk-bundle</jimage.dir>
+                                <signature.sigTestClasspath>${glassfish.home}/glassfish/modules/jakarta.json-api.jar${path.separator}${project.build.directory}/jdk-bundle/java.base${path.separator}${project.build.directory}/jdk-bundle/java.rmi${path.separator}${project.build.directory}/jdk-bundle/java.sql${path.separator}${project.build.directory}/jdk-bundle/java.naming</signature.sigTestClasspath>
+                            </systemPropertyVariables>
+                            <additionalClasspathElements>
+                                <additionalClasspathElement>${glassfish.home}/glassfish/modules/jakarta.json-api.jar</additionalClasspathElement>
+                                <additionalClasspathElement>${glassfish.home}/glassfish/modules/parsson.jar</additionalClasspathElement>
+                            </additionalClasspathElements>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>embedded-web</id>
+            <build>
+                <plugins>
+                    <!-- Download and installation of the GlassFish server used for testing  -->
+                    <plugin>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack</id>
+                                <phase>generate-test-resources</phase>
+                                <goals>
+                                    <goal>copy</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>org.glassfish.main.extras</groupId>
+                                            <artifactId>glassfish-embedded-web</artifactId>
+                                            <version>${glassfish.version}</version>
+                                            <overWrite>false</overWrite>
+                                            <outputDirectory>${glassfish.root}</outputDirectory>
+                                            <destFileName>glassfish-embedded-web.jar</destFileName>
+                                        </artifactItem>
+                                    </artifactItems>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <reuseForks>false</reuseForks>
+                            <dependenciesToScan>
+                                <dependency>jakarta.json:jakarta.json-tck-tests</dependency>
+                            </dependenciesToScan>
+                            <systemPropertyVariables>
+                                <exclude.plugin>com.sun.tdk.exclude.ExcludeList</exclude.plugin>
+<!--                                <optional.tech.packages.to.ignore>jakarta.json</optional.tech.packages.to.ignore>-->
+                                <jimage.dir>${project.build.directory}/jdk-bundle</jimage.dir>
+                                <signature.sigTestClasspath>${glassfish.root}/glassfish-embedded-web.jar${path.separator}${project.build.directory}/jdk-bundle/java.base${path.separator}${project.build.directory}/jdk-bundle/java.rmi${path.separator}${project.build.directory}/jdk-bundle/java.sql${path.separator}${project.build.directory}/jdk-bundle/java.naming</signature.sigTestClasspath>
+                            </systemPropertyVariables>
+                            <additionalClasspathElements>
+                                <additionalClasspathElement>${glassfish.root}/glassfish-embedded-web.jar</additionalClasspathElement>
+                            </additionalClasspathElements>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>report</id>
